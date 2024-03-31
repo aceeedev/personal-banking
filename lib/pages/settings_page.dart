@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:personal_banking/backend/bank_integration.dart';
+import 'package:personal_banking/models/transaction.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -30,9 +32,13 @@ class _SettingsPageState extends State<SettingsPage> {
                     await FilePicker.platform.pickFiles();
 
                 if (result != null) {
-                  File file = File(result.files.single.path!);
+                  String csvAsString =
+                      String.fromCharCodes(result.files.single.bytes!);
 
-                  print(file.uri);
+                  List<BankTransaction> list =
+                      getTransactionsFromCSV(csvAsString);
+
+                  print(list.length);
                 }
               },
             ),
