@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/widgets.dart';
 import 'package:personal_banking/pages/settings_page.dart';
 import 'package:personal_banking/backend/db_manager.dart';
 import 'package:personal_banking/models/bank_transaction.dart';
@@ -11,11 +13,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() => _counter++);
-  }
+  late List<BankTransaction> bankTransactions;
 
   @override
   Widget build(BuildContext context) {
@@ -30,20 +28,46 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            TextButton(
-                onPressed: () async {
-                  List<BankTransaction> bankTransactions =
-                      await DB.instance.getBankTransactions();
+        child: FutureBuilder(
+          future: _getFuture(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              if (snapshot.hasError) {
+                return Center(
+                    child: Text('An error has occurred, ${snapshot.error}'));
+              } else if (snapshot.hasData) {
+                bankTransactions = snapshot.data!;
 
-                  print('there are ${bankTransactions.length} transactions');
-                },
-                child: const Text('Get # of transactions'))
-          ],
+                return bankTransactions.isNotEmpty
+                    ? Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          AspectRatio(
+                            aspectRatio: 2.0,
+                            child: LineChart(LineChartData(lineBarsData: [
+                              LineChartBarData(
+                                  spots: bankTransactions
+                                      .map((e) => FlSpot(
+                                          e.date.microsecondsSinceEpoch
+                                              as double,
+                                          e.balance))
+                                      .toList())
+                            ])),
+                          )
+                        ],
+                      )
+                    : const Text('Load first');
+              }
+            }
+
+            return const Center(child: CircularProgressIndicator());
+          },
         ),
       ),
     );
+  }
+
+  Future<List<BankTransaction>> _getFuture() async {
+    return await DB.instance.getBankTransactions();
   }
 }

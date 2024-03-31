@@ -24,7 +24,9 @@ class DB {
       (await box).put(_bankTransactionsKey, bankTransactions);
 
   Future<List<BankTransaction>> getBankTransactions() async =>
-      (await box).get(_bankTransactionsKey) ?? [];
+      ((await box).get(_bankTransactionsKey) as List<dynamic>?)
+          ?.cast<BankTransaction>() ??
+      <BankTransaction>[];
 
   Future<void> deleteBankTransactions() async =>
       (await box).delete(_bankTransactionsKey);
