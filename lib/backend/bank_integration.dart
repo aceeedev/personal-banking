@@ -1,4 +1,4 @@
-import 'package:personal_banking/models/transaction.dart';
+import 'package:personal_banking/models/bank_transaction.dart';
 
 List<BankTransaction> getTransactionsFromCSV(String csvAsString) {
   List<String> csvRows = csvAsString.split('\n');

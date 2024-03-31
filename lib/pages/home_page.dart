@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:personal_banking/pages/settings_page.dart';
+import 'package:personal_banking/backend/db_manager.dart';
+import 'package:personal_banking/models/bank_transaction.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -31,20 +33,16 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
+            TextButton(
+                onPressed: () async {
+                  List<BankTransaction> bankTransactions =
+                      await DB.instance.getBankTransactions();
+
+                  print('there are ${bankTransactions.length} transactions');
+                },
+                child: const Text('Get # of transactions'))
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
       ),
     );
   }

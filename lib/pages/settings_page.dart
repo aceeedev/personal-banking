@@ -1,8 +1,8 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:personal_banking/backend/db_manager.dart';
 import 'package:personal_banking/backend/bank_integration.dart';
-import 'package:personal_banking/models/transaction.dart';
+import 'package:personal_banking/models/bank_transaction.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -35,10 +35,8 @@ class _SettingsPageState extends State<SettingsPage> {
                   String csvAsString =
                       String.fromCharCodes(result.files.single.bytes!);
 
-                  List<BankTransaction> list =
-                      getTransactionsFromCSV(csvAsString);
-
-                  print(list.length);
+                  await DB.instance.saveBankTransactions(
+                      getTransactionsFromCSV(csvAsString));
                 }
               },
             ),
